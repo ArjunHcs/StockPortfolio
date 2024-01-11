@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace StockPortfolio {
 
@@ -11,10 +12,10 @@ namespace StockPortfolio {
 
     public Stock(string symbol, string name, decimal price, decimal previousClose)
     {
-        Symbol = symbol;
-        Name = name;
-        Price = price;
-        PreviousClose = previousClose;
+      Symbol = symbol;
+      Name = name;
+      Price = price;
+      PreviousClose = previousClose;
     }
   }
 
@@ -24,6 +25,34 @@ namespace StockPortfolio {
 
     public Portfolio(decimal initialCash) {
       cashBalance = initialCash;
+    }
+
+    public string GetPortfolioSummary()
+    {
+      List<object> summaryList = new List<object>();
+
+      foreach (var holding in holdings) {
+        Stock stock = GetStockInfo(holding.Key); //GetStockInfo will be replaced with the AlphaVantage api or other stock api info 
+
+        if (stock != null) {
+          var summaryItem = new {
+            Symbol = stock.Symbol,
+                   Name = stock.Name,
+                   Quantity = holding.Value,
+                   CurrentPrice = stock.Price,
+                   TotalValue = stock.Price * holding.Value
+          };
+          summaryList.Add(summaryItem);
+        }
+      }
+      decimal cashBalance = GetCashBalance();
+      var portfolioSummary = new {
+        Holdings = summaryList,
+                 CashBalance = cashBalance,
+                 TotalPortfolioValue = GetTotalPortfolioValue()
+      };
+
+      return JsonSerializer.Serialize(portfolioSummary, new JsonSerializerOptions { WriteIndented = true });
     }
 
     public void BuyStock(Stock stock, int quantity) {
@@ -46,19 +75,26 @@ namespace StockPortfolio {
     }
 
     public void SellStock(Stock stock, int quantity) {
-      decimal totalCost = stock.Price * quantity;
-      if (quantity <= holdings[stock.Symbol]) {
-        holdings.Remove(stock.symbol, quantity);
-        cashBalance += totalCost;
-        Console.WriteLine($"Sold {quantity} shares of {stock.Symbol}");
-      } else {
-        Console.WriteLine($"Not enough shares of {stock.Symbol} to sell");
+      if (holdings.TryGetValue(stock.Symbol, out int currentQuantity)){
+
+        if (quantity <= holdings[stock.Symbol]) {
+          decimal totalCost = stock.Price * quantity;
+          holdings[stock.Symbol] = currentQuantity - quantity; 
+          cashBalance += totalCost;
+          Console.WriteLine($"Sold {quantity} shares of {stock.Symbol}");
+        } 
+        else {
+          Console.WriteLine($"Not enough shares of {stock.Symbol} to sell");
+        }
+      } 
+      else {
+        Console.WriteLine($"You do not own any {stock.Symbol}.");
       }
     }
 
   }
   public class TransactionHistory{
-    private List<string> transactions = new List<string>;
+    private List<string> transactions = new List<string>();
 
     public void AddTransaction(string symbol, string name, int quantity, decimal price, DateTime date)
     {
@@ -70,10 +106,10 @@ namespace StockPortfolio {
     }
     public IEnumerable<string> GetTransactionsFromDateRange(DateTime startDate, DateTime endDate){
       return transactions.FindAll(transaction => {
-        string[] parts = transaction.split(',');
-        //parses date of current transaction element
-        DateTime date = DateTime.Parse(parts[4].Substring(6));
-        return date >= startDate && date <= endDate;
+          string[] parts = transaction.Split(',');
+          //parses date of current transaction element
+          DateTime date = DateTime.Parse(parts[4].Substring(6));
+          return date >= startDate && date <= endDate;
           });
     }
 
@@ -84,8 +120,8 @@ namespace StockPortfolio {
         int quantity = int.Parse(parts[2]);
         decimal price = decimal.Parse(parts[3]);
         totalValue += quantity * price;
-        return totalValue;
       }
+      return totalValue;
     }
 
     public decimal GetAverageTransactionValue(){
@@ -96,13 +132,12 @@ namespace StockPortfolio {
         decimal price = decimal.Parse(parts[3]);
         totalValue += quantity * price;
 
-        if (transactions.Count > 0) {
-          return totalValue/transactions.Count;
-        }
-        return 0;
       }
+
+      if (transactions.Count > 0) {
+        return totalValue/transactions.Count;
+      }
+      return 0;
     }
   }
 }
-
-
