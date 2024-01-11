@@ -27,6 +27,21 @@ namespace StockPortfolio {
       cashBalance = initialCash;
     }
 
+    public int GetCashBalance(){
+      return cashBalance;
+    }
+    public int GetTotalPortfolioValue(){
+      decimal totalValue = cashBalance;
+
+      foreach (var holding in holdings){
+        Stock stock = GetStockInfo(holding.Key); //replace GetStockInfo with api info
+
+        if (stock != null) {
+          totalValue += stock.Price*holding.Value;
+        }
+      }
+      return totalValue;
+    }
     public string GetPortfolioSummary()
     {
       List<object> summaryList = new List<object>();
