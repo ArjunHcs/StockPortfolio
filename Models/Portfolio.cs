@@ -1,25 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace StockPortfolio {
+namespace StockPortfolio.Models {
 
-  class Stock {
-    public string Symbol { get; set; }
-    public string Name { get; set; }
-    public decimal Price { get; set; }
-    public decimal PreviousClose { get; set; }
-
-    public Stock(string symbol, string name, decimal price, decimal previousClose)
-    {
-      Symbol = symbol;
-      Name = name;
-      Price = price;
-      PreviousClose = previousClose;
-    }
-  }
-
-  class Portfolio {
+public class Portfolio {
     private Dictionary<string, int> holdings = new Dictionary<string, int>();
     private decimal cashBalance;
 
@@ -30,6 +15,7 @@ namespace StockPortfolio {
     public int GetCashBalance(){
       return cashBalance;
     }
+
     public int GetTotalPortfolioValue(){
       decimal totalValue = cashBalance;
 
@@ -42,6 +28,7 @@ namespace StockPortfolio {
       }
       return totalValue;
     }
+
     public string GetPortfolioSummary()
     {
       List<object> summaryList = new List<object>();
@@ -105,54 +92,6 @@ namespace StockPortfolio {
       else {
         Console.WriteLine($"You do not own any {stock.Symbol}.");
       }
-    }
-
-  }
-  public class TransactionHistory{
-    private List<string> transactions = new List<string>();
-
-    public void AddTransaction(string symbol, string name, int quantity, decimal price, DateTime date)
-    {
-      transactions.Add($"Symbol: {symbol}, Name: {name}, Quantity: {quantity}, Price: {price}, Date: {date}");
-    } 
-
-    public IEnumerable<string> GetTransactions() {
-      return transactions;
-    }
-    public IEnumerable<string> GetTransactionsFromDateRange(DateTime startDate, DateTime endDate){
-      return transactions.FindAll(transaction => {
-          string[] parts = transaction.Split(',');
-          //parses date of current transaction element
-          DateTime date = DateTime.Parse(parts[4].Substring(6));
-          return date >= startDate && date <= endDate;
-          });
-    }
-
-    public decimal GetTotalTransactionValue(){
-      decimal totalValue = 0;
-      foreach (string transaction in transactions){
-        string[] parts = transaction.Split(',');
-        int quantity = int.Parse(parts[2]);
-        decimal price = decimal.Parse(parts[3]);
-        totalValue += quantity * price;
-      }
-      return totalValue;
-    }
-
-    public decimal GetAverageTransactionValue(){
-      decimal totalValue = 0;
-      foreach (string transaction in transactions){
-        string[] parts = transaction.Split(',');
-        int quantity = int.Parse(parts[2]);
-        decimal price = decimal.Parse(parts[3]);
-        totalValue += quantity * price;
-
-      }
-
-      if (transactions.Count > 0) {
-        return totalValue/transactions.Count;
-      }
-      return 0;
     }
   }
 }
