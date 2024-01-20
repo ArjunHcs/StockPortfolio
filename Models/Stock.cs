@@ -1,6 +1,6 @@
 namespace StockPortfolio.Models {
 
-  class Stock {
+  public class Stock {
     public string Symbol { get; set; }
     public string Name { get; set; }
     public decimal Price { get; set; }
@@ -13,5 +13,10 @@ namespace StockPortfolio.Models {
       Price = price;
       PreviousClose = previousClose;
     }
+    public override string ToString()
+    {
+      return $"Symbol: {Symbol}, Name: {Name}, Price: {Price}, PreviousClose: {PreviousClose}";
+    }
+
   }
 }
