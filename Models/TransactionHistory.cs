@@ -10,6 +10,7 @@ namespace StockPortfolio.Models{
         public IEnumerable<string> GetTransactions() {
             return _transactions;
         }
+
         public IEnumerable<string> GetTransactionsFromDateRange(DateTime startDate, DateTime endDate){
             return _transactions.FindAll(transaction => {
                 string[] parts = transaction.Split(',');

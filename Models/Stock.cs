@@ -1,5 +1,4 @@
 namespace StockPortfolio.Models {
-
   public class Stock {
     public string Symbol { get; set; }
     public string Name { get; set; }
@@ -17,6 +16,5 @@ namespace StockPortfolio.Models {
     {
       return $"Symbol: {Symbol}, Name: {Name}, Price: {Price}, PreviousClose: {PreviousClose}";
     }
-
   }
 }
