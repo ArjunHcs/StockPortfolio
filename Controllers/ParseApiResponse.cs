@@ -1,18 +1,5 @@
 using StockPortfolio.Models;
 namespace StockPortfolio.Controllers{
-/*	
-Global Quote	
-01. symbol	"IBM"
-02. open	"191.3100"
-03. high	"192.3896"
-04. low	"186.1600"
-05. price	"187.4200"
-06. volume	"9895941"
-07. latest trading day	"2024-01-26"
-08. previous close	"190.4300"
-09. change	"-3.0100"
-10. change percent	"-1.5806%"
-*/
     public class ParseApiResponse{
         
         public Stock ParseApiResponse(string response) {
@@ -53,6 +40,40 @@ Global Quote
 
             }
             return new Stock()
+        }
+        public Stock ParseApiResponseEndpoint(string response){
+            /*	
+                Global Quote	
+                01. symbol	"IBM"
+                02. open	"191.3100"
+                03. high	"192.3896"
+                04. low	"186.1600"
+                05. price	"187.4200"
+                06. volume	"9895941"
+                07. latest trading day	"2024-01-26"
+                08. previous close	"190.4300"
+                09. change	"-3.0100"
+                10. change percent	"-1.5806%"
+                */
+            var json = JsonDocument.Parse(response);
+            JsonElement root = json.RootElement;
+
+            List<StockData> stockDataList = new List<StockData>();
+            if (root.TryGetProperty("Global Quote", out JsonElement metaData)) {
+                string symbol = metaData.GetProperty("01. symbol").GetString();
+                string open = metaData.GetProperty("02. Open").GetString();
+                string high = metaData.GetProperty("03. high").GetString();
+                string low = metaData.GetProperty("04. low").GetString();
+                string price = metaData.GetProperty("05. price").GetString();
+                string volume = metaData.GetProperty("06. volume").GetString();
+                string ltd = metaData.GetProperty("07. latest trading day").GetString();
+                string previousClose = metaData.GetProperty("08. previous close").GetString();
+                string change = metaData.GetProperty("09. change").GetString();
+                string percentChange = metaData.GetProperty("10. change percent").GetString();
+            }
+            return new Stock() {
+
+            };
         }
     }
 }

@@ -18,13 +18,21 @@ namespace StockPortfolio.Controllers {
         public async Task<decimal> GetTickerCurrentPrice(string ticker) {
             string queryUrl = $"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={API_KEY}";
             try {
-                HttpResponseMessage response = await http.GetAsync(queryUrl);
+                HttpResponseMessage response = await httpClient.GetAsync(queryUrl);
                 if (response.IsSuccessStatusCode){
                     string json = await response.Content.ReadAsStringAsync();
-
+                    var stockInfo = ParseApiResponseEndpoint(response);
+                    return stockInfo;
                 }
+                else{
+                    Console.WriteLine($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+                    return null;
+                }
+            } catch (Exception e){
+
+                Console.WriteLine($"Exception: {e.Message}");
+                return null;
             }
-            
         } 
         public async Task<Stock> GetStockInfo(string symbol) {
             string queryUrl =
@@ -86,7 +94,10 @@ namespace StockPortfolio.Controllers {
                 }
 
             }
-            return new Stock()
+
+            return new Stock {
+
+            };
         }
         public DateTime ParseTimestamp (string timestamp){
             // dateString example = "2024-01-19 19:55:00";
